@@ -1,0 +1,6 @@
+services:
+  hermes-agent:
+    image: ghcr.io/mate5630-debug/hermes-runtime-footer-public:latest
+    pull_policy: always
+    # Merge this into the existing Hostinger project. Keep the existing
+    # environment, ports, command, and persistent /opt/data volume unchanged.
