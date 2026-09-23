@@ -187,7 +187,7 @@ class RuntimeFooterPatchTests(unittest.TestCase):
         )
         self.assertEqual(line, "2s · gpt-5.6-sol · 잔여량 40% (초기화 2일 남음)")
 
-    def test_async_builder_fetches_quota_only_for_codex(self):
+    def test_async_builder_fetches_quota_when_field_is_requested_even_if_provider_is_missing(self):
         self.require_implementation()
         apply_patch(self.root)
         footer = load_module(self.root / "gateway/runtime_footer.py")
@@ -195,14 +195,14 @@ class RuntimeFooterPatchTests(unittest.TestCase):
 
         async def fake_quota(**kwargs):
             calls.append(kwargs)
-            return "잔여량 40%"
+            return "잔여량 40% (초기화 2일 남음)"
 
         config = {"fields": ["latency", "model", "codex_quota"]}
         with mock.patch.object(footer, "get_codex_quota_footer", fake_quota):
-            codex = asyncio.run(footer.build_footer_line_async(
+            line = asyncio.run(footer.build_footer_line_async(
                 user_config=config,
                 platform_key="slack",
-                provider="openai-codex",
+                provider=None,
                 model="gpt-5.6-sol",
                 context_tokens=0,
                 context_length=None,
@@ -210,17 +210,7 @@ class RuntimeFooterPatchTests(unittest.TestCase):
                 requested_model="gpt-5.6-sol",
                 served_model="gpt-5.6-sol",
             ))
-            other = asyncio.run(footer.build_footer_line_async(
-                user_config=config,
-                platform_key="slack",
-                provider="google",
-                model="gemini",
-                context_tokens=0,
-                context_length=None,
-                turn_seconds=1.0,
-            ))
-        self.assertEqual(codex, "1s · gpt-5.6-sol · 잔여량 40%")
-        self.assertEqual(other, "1s · gemini")
+        self.assertEqual(line, "1s · gpt-5.6-sol · 잔여량 40% (초기화 2일 남음)")
         self.assertEqual(len(calls), 1)
 
 

@@ -143,7 +143,10 @@ async def build_footer_line_async(*, user_config: dict[str, Any] | None, platfor
         return ""
     fields = cfg.get("fields") or _DEFAULT_FIELDS
     quota = ""
-    if "codex_quota" in fields and str(provider or "").strip().lower() == "openai-codex":
+    if "codex_quota" in fields:
+        # The field itself is the operator's explicit opt-in.  Do not depend on the
+        # result dict carrying a provider value: some gateway delivery paths omit it.
+        # The account-usage reader fails open when no Codex login is available.
         quota = await get_codex_quota_footer(timeout=quota_timeout)
     return format_runtime_footer(
         model=model, context_tokens=context_tokens, context_length=context_length,

@@ -57,7 +57,7 @@ def main() -> int:
                 "enabled": True,
                 "fields": ["latency", "model", "codex_quota"],
             }}},
-            platform_key="slack", provider="openai-codex", model="gpt-5.6-sol",
+            platform_key="slack", provider=None, model="gpt-5.6-sol",
             context_tokens=0, context_length=None, turn_seconds=1.0,
         ))
     if built != "1s · gpt-5.6-sol · 잔여량 40%":
